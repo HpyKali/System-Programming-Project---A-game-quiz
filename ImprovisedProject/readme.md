@@ -8,7 +8,7 @@ This program is a **Graphical User Interface (GUI) quiz game** designed to test 
 | **Instructor** | Ibrahim El Didi (`@BoB`) |
 | **Subject** | Kali, Linux Basics, Python, Bash Scripting |
 | **Technology**| Python, Tkinter (GUI), Pillow (Image Handling) |
-| | **University** | **Prince Mohammed Bin Fahd University** |
+| **University**| **Prince Mohammed Bin Fahd University**|
 
 How to Install and Run
 
@@ -60,4 +60,5 @@ The core functionality and structure of the quiz rely on standard Python librari
 ### Configuration Note
 
 When modifying the code, please be advised that removing or adding any structural elements (like indentation, parentheses, or commas) can easily break the program. Feel free to experiment with the code only if you understand the Python syntax fully.
+
 
