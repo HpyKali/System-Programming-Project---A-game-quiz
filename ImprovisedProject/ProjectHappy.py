@@ -760,7 +760,7 @@ class UndertaleQuizGUI:
             else:
                 lbl.config(text="  " + self.subjects[i], fg="white")
 
-        #Quiz Subjects Menu
+#Quiz Subjects Menu
 
     def Quiz_Boot(self, subject):
         self.current_subject = subject
@@ -1017,3 +1017,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = UndertaleQuizGUI(root)
     root.mainloop()
+
