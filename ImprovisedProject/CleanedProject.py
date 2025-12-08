@@ -653,8 +653,8 @@ class UndertaleQuizGUI:
         # self.bank.new = new()
 
         #Layout
-        # The top part of the window with the student info
-        self.header_frame = tk.Frame(self.root, bg=self.WIDGET_BG_COLOR, pady=8) # <--- FIXED
+        # Header
+        self.header_frame = tk.Frame(self.root, bg=self.WIDGET_BG_COLOR, pady=8) #FIXED DO NOT CHANGE
         self.header_frame.pack(fill="x")
 
         header_text = (
@@ -667,7 +667,7 @@ class UndertaleQuizGUI:
             "       (=^.^=)\n"
             "      c(  <\n  <3 )<c\n"
         )
-        # The big block of text at the top
+        # Header Text
         self.header_label = tk.Label(
             self.header_frame,
             text=header_text,
@@ -678,7 +678,7 @@ class UndertaleQuizGUI:
         )
         self.header_label.pack(side="left", padx=20)
 
-        # The part that shows our current score
+        # Score Board
         self.score_label = tk.Label(
             self.header_frame,
             text="Score: 0 / 0",
@@ -707,11 +707,11 @@ class UndertaleQuizGUI:
         self.menu_labels = []
         # The "SELECT SUBJECT" title
         self.title_label = None
-        # The question text itself
+         # The question text itself
         self.question_label = None
         # The list of option labels for the question
         self.option_labels = []
-        # The box where the cat tells you if you are right or wrong
+     # The box where the cat tells you if you are right or wrong
         self.feedback_label = None
 
         # Movement
@@ -725,7 +725,7 @@ class UndertaleQuizGUI:
 
     # Drawing
 
-    # Delete all the old stuff on the screen so we can draw the new screen
+    # Clears data on the screen, to go on to the next page
     def clear_content(self):
         for widget in self.content_frame.winfo_children():
             widget.destroy()
@@ -734,7 +734,7 @@ class UndertaleQuizGUI:
         self.question_label = None
         self.feedback_label = None
 
-    # This changes the "Subject:" line at the top
+    # This changes the Subject
     def update_header_subject(self, subject_text):
         header_text = (
             "Prince Mohammad Bin Fahd University\n"
@@ -744,13 +744,13 @@ class UndertaleQuizGUI:
             f"Subject: {subject_text}\n"
             "Project: Kali + Basics + Python\n"
         )
-        # HEADER LABEL background is already set in __init__
+        #background is already set in __init__
 
         self.header_label.config(text=header_text)
 
     # Draws the main menu screen
     def draw_menu(self):
-        # Set the state to menu
+        # Set the state to menu, so self. can work
         self.game_state = "menu"
         self.clear_content()
         self.score_label.config(text="Score: 0 / 0")
@@ -783,6 +783,7 @@ class UndertaleQuizGUI:
         self.upd_menu()
 
     # Start the actual quiz when a subject is picked
+    # Fight
     def Quiz_Boot(self, subject):
         self.current_fight_name = subject
 
@@ -1019,4 +1020,5 @@ class UndertaleQuizGUI:
 if __name__ == "__main__":
     root = tk.Tk()
     app = UndertaleQuizGUI(root)
+
     root.mainloop()
