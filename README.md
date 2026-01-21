@@ -28,19 +28,24 @@ Open your terminal or command prompt and install the necessary package:
     ```bash
     pip3 install Pillow
     ```
+    * **Run the code in terminal**
+    ```bash
+    git clone https://github.com/HpyKali/System-Programming-Project---A-game-quiz.git
+    ```
 
 ### 3\. Run the Program
 
-1.  Copy the entire Python code.
-2.  Paste it into a file named, for example, `QuizGame.py`.
-3.  Place your background image file (e.g., `bg.jpg`) in the same directory.
-4.  Execute the script from your terminal:
+1.  Locate the folder that has the file **Linux.py** in terminal.
+    For E.X (**cd /Desktop/System-Programming-Project---A-game-quiz**)
+2.  Make sure that the program can be excuted by
+    (chmod +x run.sh)
+3.  Execute the script from your terminal:
     ```bash
-    python QuizGame.py
+    python Linux.py
     # OR
-    python3 QuizGame.py
+    python3 Linux.py
     ```
-5.  Enjoy\!
+4.  Enjoy\!
 
 -----
 
