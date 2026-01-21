@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 import tkinter as tk
 from dataclasses import dataclass
 import random
+import os
 from PIL import Image, ImageTk 
-
 
 @dataclass
 class Question:
@@ -13,17 +14,8 @@ class Question:
     # Which path is the pacifist route (the correct answer index)
     correct_index: int
 
-
-def build_basic_cmd_i_questions(): # <- this is where the questions are stored depending on the section/chapter
+def build_basic_cmd_i_questions(): 
     q = []
-    # How to create your own Questions
-    # q.append(Question(prompt, 4-choices seperateed by commasinside a list, correct_index))
-    #q.append(Question("Who is the author", ["BoB", "Bob", "BOB!", "Bob"], 0))
-    q.append(Question(
-        "In Linux, which command shows your current username?",
-        ["whoami", "who", "id -u", "user"],
-        0,
-    ))
     q.append(Question(
         "In Linux, which command shows your current username?",
         ["whoami", "who", "id -u", "user"],
@@ -124,13 +116,10 @@ def build_basic_cmd_i_questions(): # <- this is where the questions are stored d
         ["mkdir -r", "mkdir -p", "mkdir -n", "mkdir -R"],
         1,
     ))
-
     return q
-
 
 def build_basic_cmd_ii_questions():
     q = []
-    # Existing questions
     q.append(Question(
         "Which command is used to add a new user on Linux?",
         ["useradd", "sudo adduser", "mkuser", "newuser"],
@@ -256,7 +245,6 @@ def build_basic_cmd_ii_questions():
         ],
         1,
     ))
-
     q.append(Question(
         "Find lines containing 'root' in /etc/passwd:",
         ["grep root /etc/passwd", "find root /etc/passwd", "search root /etc/passwd", "cat -g root /etc/passwd"],
@@ -317,13 +305,10 @@ def build_basic_cmd_ii_questions():
         ["ip a", "ifconfig -all", "netstat -i", "route print"],
         0,
     ))
-
     return q
-
 
 def build_python_questions():
     q = []
-
     q.append(Question(
         "Which command shows the installed Python 3 version in Linux?",
         ["python --ver", "python3 -v", "python3 --version", "py3 --v"],
@@ -444,14 +429,10 @@ def build_python_questions():
         ["skip", "continue", "next", "pass"],
         1,
     ))
-
     return q
-
 
 def build_bash_scripting_questions():
     q = []
-    #When pop up cannot write via keyboard <---> Make remove and let the code sit for next year 
-    #Someone might fix it and update the questions/code and to credit I Muwaahahahaha
     q.append(Question(
         "Which line is the shebang for a Bash script?",
         ["#!/bin/bash", "#!/usr/bin/python", "#!/bash", "#!bash"],
@@ -572,89 +553,61 @@ def build_bash_scripting_questions():
         ],
         2,
     ))
-
     return q
-
-# Short answer questions 
-# This class is designed for terminal input/output, for future adaptation.
-class Short_Ans:
-    def __init__(self, prompt: str, acceptable: list[str], explain: str = "", difficulty: int = 1):
-        self.prompt = prompt
-        self.acceptable = [a.strip().lower() for a in acceptable]
-        self.explain = explain
-        self.difficulty = difficulty
-    #DO NOT TOUCH IT WILL BREAK THE PROGRAM <- just fix it :)
-    def ask(self, qnum: int, total: int) -> bool:
-        return False 
 
 class UndertaleQuizGUI:
     def __init__(self, root):
-        # The main game window
         self.root = root
         self.root.title("System Programming Project - PMU Credit : Happy🐈 - BoB")
         self.root.geometry("1280x720")
         
-        # 1. Image Path (Use your actual filename)
-        image_path = "ImprovisedProject\\bg.jpg"  # <-- Use your actual filename here add \\ to the path
+        # --- LINUX FIX START ---
+        # Using os.path.join for Linux/Windows compatibility
+        self.image_folder = "ImprovisedProject"
+        self.image_name = "bg.jpg"
+        self.image_path = os.path.join(self.image_folder, self.image_name)
+        # --- LINUX FIX END ---
         
         try:
-            pil_image = Image.open(image_path)
-            
+            pil_image = Image.open(self.image_path)
             self.bg_image = ImageTk.PhotoImage(pil_image)
             
+            # Create the background label
+            self.background_label = tk.Label(self.root, image=self.bg_image)
+            self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
+            
         except FileNotFoundError:
-            print(f"Error: Image file '{image_path}' not found. Using fallback dark color.")
-            # Fallback color (if image fails) because it always does
-            #WARNING <---CRASHES IF YOU COMMENT IT--->
+            print(f"Error: Image file '{self.image_path}' not found. Using fallback dark color.")
             self.root.configure(bg="#050505")
-            self.bg_image = tk.PhotoImage(width=1, height=1) 
+            self.bg_image = None
+            # We don't create the label if image fails, just set root color
         
-        # 4. Create the background label (which holds the image)
-        self.background_label = tk.Label(self.root, image=self.bg_image)
-        # 5. Place the label to cover the entire window
-        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
-        #Background Color <-Do no touch->
         self.WIDGET_BG_COLOR = "#050505" 
 
         # State variables
-        # What part of the game we are in (menu, quiz, finished)
         self.game_state = "menu"
-        # The different levels/boss fights you can choose from
         self.boss_fights = [
             "Basic Command I",
             "Basic Command II",
             "Python I & II",
             "Bash Scripting",
         ]
-        # Which option the arrow is pointing at in the menu right now
         self.menu_pointer = 0
-        # The name of the boss fight we picked (current quiz subject)
         self.current_fight_name = None
-        # The list of questions for the current boss fight
         self.fight_questions = []
-        # The index of the current question we are on
         self.question_count = 0
-        # How many times we hit the enemy (the score)
         self.mercy_score = 0
-        # Which option the cat arrow is pointing at for the answer
         self.choice_cursor = 0
-        # Did the user already answer this question? Don't let them click again!
         self.fight_locked = False
 
         # Build question banks
-        # The basic Linux commands, part 1 questions
         self.bank_basic_i = build_basic_cmd_i_questions()
-        # The basic Linux commands, part 2 questions
         self.bank_basic_ii = build_basic_cmd_ii_questions()
-        # Python questions
         self.bank_python = build_python_questions()
-        # Bash scripting questions
         self.bank_bash = build_bash_scripting_questions()
-        # self.bank.new = new()
 
-        #Layout
-        # Header
-        self.header_frame = tk.Frame(self.root, bg=self.WIDGET_BG_COLOR, pady=8) #FIXED DO NOT CHANGE
+        # Layout
+        self.header_frame = tk.Frame(self.root, bg=self.WIDGET_BG_COLOR, pady=8)
         self.header_frame.pack(fill="x")
 
         header_text = (
@@ -664,58 +617,47 @@ class UndertaleQuizGUI:
             "Subject: (select from menu)\n"
             "Project: Kali + Basics + Python\n"
             "My kat: /\\_/\\ \n"
-            "       (=^.^=)\n"
-            "      c(  <\n  <3 )<c\n"
+            "       (=^.^=)\n"
+            "      c(  <\n  <3 )<c\n"
         )
-        # Header Text
         self.header_label = tk.Label(
             self.header_frame,
             text=header_text,
             font=("Consolas", 12),
             fg="white",
-            bg=self.WIDGET_BG_COLOR, # <--- FIXED
+            bg=self.WIDGET_BG_COLOR,
             justify="left",
         )
         self.header_label.pack(side="left", padx=20)
 
-        # Score Board
         self.score_label = tk.Label(
             self.header_frame,
             text="Score: 0 / 0",
             font=("Consolas", 12, "bold"),
             fg="#FFD700",
-            bg=self.WIDGET_BG_COLOR, # <--- FIXED
+            bg=self.WIDGET_BG_COLOR,
         )
         self.score_label.pack(side="right", padx=20)
 
-        # The main area where the questions/menu go
-        self.content_frame = tk.Frame(self.root, bg=self.WIDGET_BG_COLOR) # <--- FIXED
+        self.content_frame = tk.Frame(self.root, bg=self.WIDGET_BG_COLOR)
         self.content_frame.pack(fill="both", expand=True, pady=10)
 
-        # The hint text at the bottom
         self.footer_label = tk.Label(
             self.root,
             text="Use ↑ / ↓ to move, Enter to confirm.",
             font=("Consolas", 10),
             fg="#CCCCCC",
-            bg=self.WIDGET_BG_COLOR, # <--- FIXED (Placed on root, but still needs color set)
+            bg=self.WIDGET_BG_COLOR,
         )
         self.footer_label.pack(side="bottom", pady=5)
 
-        # Placeholders to be created in draw functions
-        # The list of subject names on the menu
         self.menu_labels = []
-        # The "SELECT SUBJECT" title
         self.title_label = None
-         # The question text itself
         self.question_label = None
-        # The list of option labels for the question
         self.option_labels = []
-     # The box where the cat tells you if you are right or wrong
         self.feedback_label = None
 
-        # Movement
-        # Binding arrow keys to movement
+        # Bind keys
         self.root.bind("<Up>", self.on_key_up)
         self.root.bind("<Down>", self.on_key_down)
         self.root.bind("<Return>", self.on_key_enter)
@@ -723,9 +665,6 @@ class UndertaleQuizGUI:
 
         self.draw_menu()
 
-    # Drawing
-
-    # Clears data on the screen, to go on to the next page
     def clear_content(self):
         for widget in self.content_frame.winfo_children():
             widget.destroy()
@@ -734,7 +673,6 @@ class UndertaleQuizGUI:
         self.question_label = None
         self.feedback_label = None
 
-    # This changes the Subject
     def update_header_subject(self, subject_text):
         header_text = (
             "Prince Mohammad Bin Fahd University\n"
@@ -744,13 +682,9 @@ class UndertaleQuizGUI:
             f"Subject: {subject_text}\n"
             "Project: Kali + Basics + Python\n"
         )
-        #background is already set in __init__
-
         self.header_label.config(text=header_text)
 
-    # Draws the main menu screen
     def draw_menu(self):
-        # Set the state to menu, so self. can work
         self.game_state = "menu"
         self.clear_content()
         self.score_label.config(text="Score: 0 / 0")
@@ -761,33 +695,27 @@ class UndertaleQuizGUI:
             text="== SELECT BOSS FIGHT (Chapter) ==",
             font=("Consolas", 18, "bold"),
             fg="white",
-            bg=self.WIDGET_BG_COLOR, # <--- FIXED
+            bg=self.WIDGET_BG_COLOR,
         )
         self.title_label.pack(pady=20)
 
-        # subject options
         for i, subject in enumerate(self.boss_fights):
             lbl = tk.Label(
                 self.content_frame,
                 text=subject,
                 font=("Consolas", 14),
                 fg="white",
-                bg=self.WIDGET_BG_COLOR, # <--- FIXED
+                bg=self.WIDGET_BG_COLOR,
                 anchor="w",
             )
             lbl.pack(pady=5)
             self.menu_labels.append(lbl)
 
-        # Reset pointer and update the GUI
         self.menu_pointer = 0
         self.upd_menu()
 
-    # Start the actual quiz when a subject is picked
-    # Fight
     def Quiz_Boot(self, subject):
         self.current_fight_name = subject
-
-        # Load the right list of questions
         if subject == "Basic Command I":
             bank = self.bank_basic_i
         elif subject == "Basic Command II":
@@ -797,44 +725,29 @@ class UndertaleQuizGUI:
         else:
             bank = self.bank_bash
 
-        # pick up to 50 questions (or all if fewer)
-        # the more questions the bigger the array/list need to adjust manually
-        
-        # Max number of questions to pick
         max_q_limit = 50
         if len(bank) > max_q_limit:
-            # Pick a random sample of the questions
-            # If questions > 50 it will pick 50 random questions and sort them in order
             self.fight_questions = random.sample(bank, max_q_limit)
         else:
-            # Or just use all the questions if there aren't many
             self.fight_questions = list(bank)
 
-        # Reset points
         self.mercy_score = 0
         self.question_count = 0
         self.choice_cursor = 0
 
         self.update_header_subject(subject)
         self.score_label.config(text=f"Score: 0 / {len(self.fight_questions)}")
-
-        # Start the first question
         self.Questions_Gen()
 
-    # Change the color and arrow for the menu options
     def upd_menu(self):
         for i, lbl in enumerate(self.menu_labels):
             if i == self.menu_pointer:
-                # Highlight the selected option
                 lbl.config(text="▶ " + self.boss_fights[i], fg="#FFD700", bg=self.WIDGET_BG_COLOR)
             else:
-                # Un-highlight the others
-                lbl.config(text="  " + self.boss_fights[i], fg="white", bg=self.WIDGET_BG_COLOR)
+                lbl.config(text="  " + self.boss_fights[i], fg="white", bg=self.WIDGET_BG_COLOR)
 
-    # Draws the current question screen
     def Questions_Gen(self):
         self.game_state = "quiz"
-        # Unlock the answer submission
         self.fight_locked = False
         self.clear_content()
 
@@ -842,33 +755,29 @@ class UndertaleQuizGUI:
             self.Credits()
             return
 
-        # Get the current question
         current_question = self.fight_questions[self.question_count]
 
-        # Question text
         self.question_label = tk.Label(
             self.content_frame,
             text=f"Q{self.question_count+1}/{len(self.fight_questions)}: {current_question.prompt}",
             font=("Consolas", 14, "bold"),
             fg="white",
-            bg=self.WIDGET_BG_COLOR, # <--- FIXED
+            bg=self.WIDGET_BG_COLOR,
             wraplength=800,
             justify="left",
         )
         self.question_label.pack(pady=20, anchor="w")
 
-        # Options
         self.option_labels = []
-        # Reset the pointer at index 0
         self.choice_cursor = 0
-        #Pent Testing Choice but re-work
+
         for idx, choice in enumerate(current_question.choices):
             lbl = tk.Label(
                 self.content_frame,
                 text=choice,
                 font=("Consolas", 13),
                 fg="white",
-                bg=self.WIDGET_BG_COLOR, # <--- FIXED
+                bg=self.WIDGET_BG_COLOR,
                 anchor="w",
             )
             lbl.pack(pady=3, anchor="w", padx=40)
@@ -876,73 +785,58 @@ class UndertaleQuizGUI:
 
         self.upd_opt()
 
-        # Feedback label
         self.feedback_label = tk.Label(
             self.content_frame,
             text="",
             font=("Consolas", 14),
             fg="#AAAAAA",
-            bg=self.WIDGET_BG_COLOR, # <--- FIXED
+            bg=self.WIDGET_BG_COLOR,
             justify="left",
         )
         self.feedback_label.pack(pady=20, anchor="w", padx=40)
-#From Penetration testing by Milio
 
-    # Change the cursor (cat) position on the options list
     def upd_opt(self):
         for i, lbl in enumerate(self.option_labels):
-            prefix = "   "
+            prefix = "   "
             color = "white"
             if i == self.choice_cursor:
-                # Highlight the selected option with the cat emoji
-                prefix = "🐈"
+                prefix = "🐈 "
                 color = "#00ffe5"
-            # Ensure the background color is consistently set here too
-            lbl.config(text=prefix + self.fight_questions[self.question_count].choices[i], fg=color, bg=self.WIDGET_BG_COLOR) # <--- FIXED
+            lbl.config(text=prefix + self.fight_questions[self.question_count].choices[i], fg=color, bg=self.WIDGET_BG_COLOR)
 
     def check_answer(self):
         if self.fight_locked:
             return
         self.fight_locked = True
 
-        # Get the current question
         q = self.fight_questions[self.question_count]
-        # Check if the chosen index is the correct index
         correct = (self.choice_cursor == q.correct_index)
 
         if correct:
-            # Increase the score/hit counter
             self.mercy_score += 1
-            cat_text = " /\\_/\\\n( o.o )  Purrr-fect!\n > ^ <  Correct!\n"
+            cat_text = " /\\_/\\\n( o.o )  Purrr-fect!\n > ^ <  Correct!\n"
             self.feedback_label.config(text=cat_text, fg="#00FF7F")
         else:
             correct_choice = q.choices[q.correct_index]
             cat_text = (
-                " /\\_/\\\n( x.x )  gitgud!\n > ^ <  Try again.\n\n"
+                " /\\_/\\\n( x.x )  gitgud!\n > ^ <  Try again.\n\n"
                 f"Correct: {correct_choice}"
             )
             self.feedback_label.config(text=cat_text, fg="#FF5555")
 
-        # Update the score display at the top
         self.score_label.config(
             text=f"Score: {self.mercy_score} / {len(self.fight_questions)}"
         )
-
-        # delaying each question, to see the correct answer and also to make sure no one double clicks
-        # Wait a bit then move to the next question
+        # --- NON BLOCKING WAIT ---
         self.root.after(2000, self.next_question)
 
-    # Move to the next question or the final screen
     def next_question(self):
         self.question_count += 1
-        # Check if we are done
         if self.question_count >= len(self.fight_questions):
             self.Credits()
         else:
             self.Questions_Gen()
 
-    #Grades
-    # The final screen showing the results and letting you quit/restart
     def Credits(self):
         self.game_state = "finished"
         self.clear_content()
@@ -950,7 +844,6 @@ class UndertaleQuizGUI:
         total = len(self.fight_questions)
         score_text = f"Your score: {self.mercy_score} / {total}"
 
-        # Determine the final message based on percentage
         if self.mercy_score == total:
             msg = "Your Killing it"
         elif self.mercy_score >= total * 0.75:
@@ -965,7 +858,7 @@ class UndertaleQuizGUI:
             text=score_text + "\n\n" + msg,
             font=("Consolas", 16, "bold"),
             fg="white",
-            bg=self.WIDGET_BG_COLOR, # <--- FIXED
+            bg=self.WIDGET_BG_COLOR,
             justify="center",
         )
         result_label.pack(pady=40)
@@ -975,50 +868,36 @@ class UndertaleQuizGUI:
             text="Press Enter to go back to subject menu.\nPress Esc to quit.",
             font=("Consolas", 12),
             fg="#BBBBBB",
-            bg=self.WIDGET_BG_COLOR, # <--- FIXED
+            bg=self.WIDGET_BG_COLOR,
         )
         hint_label.pack(pady=10)
 
-    #Key
-    # Handle the 'Up' key press
     def on_key_up(self, event):
         if self.game_state == "menu":
-            # Move the menu pointer up (circularly)
             self.menu_pointer = (self.menu_pointer - 1) % len(self.boss_fights)
             self.upd_menu()
-        # Only allow movement if it's a quiz and not locked (answered)
         elif self.game_state == "quiz" and not self.fight_locked:
-            # Move the option selector up (circularly)
             self.choice_cursor = (self.choice_cursor - 1) % len(self.option_labels)
             self.upd_opt()
 
-    # Handle the 'Down' key press
     def on_key_down(self, event):
         if self.game_state == "menu":
-            # Move the menu pointer down (circularly)
             self.menu_pointer = (self.menu_pointer + 1) % len(self.boss_fights)
             self.upd_menu()
         elif self.game_state == "quiz" and not self.fight_locked:
             self.choice_cursor = (self.choice_cursor + 1) % len(self.option_labels)
             self.upd_opt()
 
-    # enter key
     def on_key_enter(self, event):
         if self.game_state == "menu":
-            # Start the selected quiz
             subject = self.boss_fights[self.menu_pointer]
             self.Quiz_Boot(subject)
         elif self.game_state == "quiz":
-            # Submit the current answer
             self.check_answer()
         elif self.game_state == "finished":
-            # Go back to the menu
             self.draw_menu()
 
-
-#Boot up!
 if __name__ == "__main__":
     root = tk.Tk()
     app = UndertaleQuizGUI(root)
-
     root.mainloop()
